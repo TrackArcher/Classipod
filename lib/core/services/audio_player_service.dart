@@ -58,9 +58,14 @@ void _reconcileLibrary(Ref ref, LibraryAudioHandler handler) {
       : now.metadataList;
   final retained = songs
       .where(
-        (song) =>
-            !song.isSubsonic ||
-            (remote?.enabled == true && remote?.config?.id == song.serverId),
+        (song) {
+          if (!song.isSubsonic) return true;
+          if (remote?.enabled != true || remote?.config?.id != song.serverId) {
+            return false;
+          }
+          if (song.isInternetRadio) return true;
+          return remote!.available(song);
+        },
       )
       .toList();
   if (listEquals(now.metadataList, retained)) return;
@@ -360,6 +365,33 @@ class AudioPlayerServiceNotifier extends AsyncNotifier<void> {
       } else {
         await ref.read(libraryAudioHandlerProvider).select(index);
       }
+    });
+  }
+
+  Future<void> playInternetRadio({
+    required List<MusicMetadata> metadataList,
+    required int stationIndex,
+  }) async {
+    if (metadataList.isEmpty ||
+        stationIndex < 0 ||
+        stationIndex >= metadataList.length) {
+      return;
+    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final nowPlayingDetails = ref.read(nowPlayingDetailsProvider);
+      if (nowPlayingDetails.nowPlayingType == NowPlayingType.songs &&
+          listEquals(nowPlayingDetails.metadataList, metadataList) &&
+          nowPlayingDetails.currentMetadata?.isInternetRadio == true) {
+        await playSongAtIndex(stationIndex);
+        return;
+      }
+      await setAudioSource(
+        preload: false,
+        musicMetadataList: metadataList,
+      );
+      await playSongAtIndex(stationIndex);
+      Future.delayed(const Duration(milliseconds: 100), play);
     });
   }
 

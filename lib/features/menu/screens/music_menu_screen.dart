@@ -15,6 +15,7 @@ enum _MusicListDisplayItems {
   albums,
   songs,
   genres,
+  radio,
   search;
 
   String title(BuildContext context) {
@@ -31,6 +32,8 @@ enum _MusicListDisplayItems {
         return context.localization.songsScreenTitle;
       case genres:
         return context.localization.genresScreenTitle;
+      case radio:
+        return context.localization.radioScreenTitle;
       case search:
         return context.localization.searchScreenTitle;
     }
@@ -55,7 +58,7 @@ class _MusicMenuScreenState extends ConsumerState<MusicMenuScreen>
 
   @override
   Future<void> onSelectPressed() =>
-      _navigateToScreen(_MusicListDisplayItems.values[selectedDisplayItem]);
+      _navigateToScreen(displayItems[selectedDisplayItem]);
 
   Future<void> _navigateToScreen(
     _MusicListDisplayItems musicDisplayItem,
@@ -86,6 +89,9 @@ class _MusicMenuScreenState extends ConsumerState<MusicMenuScreen>
         break;
       case _MusicListDisplayItems.genres:
         context.goNamed(Routes.genres.name);
+        break;
+      case _MusicListDisplayItems.radio:
+        context.goNamed(Routes.radio.name);
         break;
       case _MusicListDisplayItems.search:
         context.goNamed(Routes.search.name);

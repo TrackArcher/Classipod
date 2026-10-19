@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:classipod/core/subsonic/internet_radio_station.dart';
 import 'package:classipod/core/subsonic/subsonic_client.dart';
+import 'package:classipod/core/subsonic/subsonic_radio_api.dart';
 import 'package:classipod/core/subsonic/subsonic_repository.dart';
 import 'package:classipod/hive/hive_adapters.dart';
 import 'package:classipod/hive/hive_registrar.g.dart';
@@ -146,6 +148,33 @@ void main() {
       expect(Uri.parse(song.thumbnailPath!).pathSegments.single, 'art / id');
       expect(song.parentDirectoryPath, isNull);
       expect(song.toAudioSource, throwsStateError);
+    });
+
+    test('loads internet radio stations from the API', () async {
+      final client = SubsonicClient(
+        config,
+        'secret',
+        client: MockClient((request) async {
+          expect(
+            request.url.path,
+            endsWith('getInternetRadioStations.view'),
+          );
+          return ok({
+            'internetRadioStations': {
+              'internetRadioStation': {
+                'id': '1',
+                'name': 'Test FM',
+                'streamUrl': 'https://stream.test/live',
+              },
+            },
+          });
+        }),
+      );
+      addTearDown(client.close);
+      final stations = await SubsonicRadioApi.list(client);
+      expect(stations, hasLength(1));
+      expect(stations.single, isA<InternetRadioStation>());
+      expect(stations.single.name, 'Test FM');
     });
   });
 

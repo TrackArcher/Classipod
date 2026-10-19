@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:classipod/core/extensions/build_context_extensions.dart';
 import 'package:classipod/core/extensions/go_router_extensions.dart';
@@ -10,11 +11,13 @@ import 'package:classipod/features/menu/controller/split_screen_controller.dart'
 import 'package:classipod/features/menu/models/split_screen_type.dart';
 import 'package:classipod/features/tutorial/controller/tutorial_controller.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 enum _MainMenuDisplayItems {
   music,
+  apps,
   settings,
   shuffleSongs,
   nowPlaying;
@@ -23,6 +26,8 @@ enum _MainMenuDisplayItems {
     switch (this) {
       case music:
         return context.localization.musicMenuScreenTitle;
+      case apps:
+        return context.localization.appsMenuScreenTitle;
       case settings:
         return context.localization.settingsScreenTitle;
       case shuffleSongs:
@@ -48,7 +53,14 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen>
   String get routeName => Routes.menu.name;
 
   @override
-  List<_MainMenuDisplayItems> get displayItems => _MainMenuDisplayItems.values;
+  List<_MainMenuDisplayItems> get displayItems {
+    if (!kIsWeb && Platform.isAndroid) {
+      return _MainMenuDisplayItems.values;
+    }
+    return _MainMenuDisplayItems.values
+        .where((item) => item != _MainMenuDisplayItems.apps)
+        .toList();
+  }
 
   @override
   void onMenuButtonPressed() {
@@ -57,13 +69,16 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen>
 
   @override
   Future<void> onSelectPressed() =>
-      _navigateToScreen(_MainMenuDisplayItems.values[selectedDisplayItem]);
+      _navigateToScreen(displayItems[selectedDisplayItem]);
 
   Future<void> _navigateToScreen(_MainMenuDisplayItems menuItem) async {
     setState(() => selectedDisplayItem = displayItems.indexOf(menuItem));
     switch (menuItem) {
       case _MainMenuDisplayItems.music:
         context.goNamed(Routes.musicMenu.name);
+        break;
+      case _MainMenuDisplayItems.apps:
+        context.goNamed(Routes.apps.name);
         break;
       case _MainMenuDisplayItems.nowPlaying:
         await _navigateToNowPlayingScreen();
@@ -94,6 +109,10 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen>
       case _MainMenuDisplayItems.music:
         ref.read(splitScreenControllerProvider.notifier).changeSplitScreenType =
             SplitScreenType.albumArt;
+        break;
+      case _MainMenuDisplayItems.apps:
+        ref.read(splitScreenControllerProvider.notifier).changeSplitScreenType =
+            SplitScreenType.apps;
         break;
       case _MainMenuDisplayItems.settings:
         ref.read(splitScreenControllerProvider.notifier).changeSplitScreenType =

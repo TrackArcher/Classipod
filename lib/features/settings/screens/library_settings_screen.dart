@@ -12,6 +12,7 @@ import 'package:classipod/features/settings/controller/hide_local_music_controll
 import 'package:classipod/features/settings/controller/prevent_duplicate_tracks_controller.dart';
 import 'package:classipod/features/settings/controller/settings_preferences_controller.dart';
 import 'package:classipod/features/settings/widgets/settings_list_tile.dart';
+import 'package:classipod/features/settings/widgets/elzicy_dialog.dart';
 import 'package:classipod/features/settings/widgets/subsonic_dialog.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,7 @@ import 'package:go_router/go_router.dart';
 enum _LibrarySettingsItems {
   subsonic,
   configureSubsonic,
+  elzicy,
   hideLocalMusic,
   preventDuplicateTracks,
   reindex,
@@ -33,13 +35,14 @@ enum _LibrarySettingsItems {
     hideLocalMusic => context.localization.hideLocalMusicTitle,
     missingTracks => context.localization.missingTracksTitle,
     configureSubsonic => context.localization.subsonicConfigure,
+    elzicy => context.localization.elzicySettingsTitle,
     excludeDirectories => context.localization.excludeDirectoriesScreenTitle,
     reindex => context.localization.reindexLibrarySettingTitle,
     refreshLibrary => context.localization.refreshLibrarySettingTitle,
   };
 
   SplitScreenType get preview => switch (this) {
-    subsonic || configureSubsonic => SplitScreenType.subsonic,
+    subsonic || configureSubsonic || elzicy => SplitScreenType.subsonic,
     hideLocalMusic => SplitScreenType.hideLocalMusic,
     preventDuplicateTracks => SplitScreenType.preventDuplicateTracks,
     excludeDirectories => SplitScreenType.excludeDirectories,
@@ -113,6 +116,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
           break;
         case _LibrarySettingsItems.configureSubsonic:
           await showSubsonicDialog(context);
+          break;
+        case _LibrarySettingsItems.elzicy:
+          await showElzicyDialog(context);
           break;
         case _LibrarySettingsItems.missingTracks:
           context.goNamed(Routes.missingTracks.name);

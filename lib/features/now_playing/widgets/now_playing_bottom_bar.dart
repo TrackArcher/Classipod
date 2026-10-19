@@ -32,13 +32,13 @@ class NowPlayingBottomBar extends ConsumerWidget {
         stream: handler.playbackState,
         initialData: handler.playbackState.value,
         builder: (context, snapshot) {
-          final double totalDuration =
-              (ref
-                      .watch(nowPlayingDetailsProvider)
-                      .currentMetadata
-                      ?.trackDuration ??
-                  1000) /
-              1000;
+          final metadata = ref.watch(
+            nowPlayingDetailsProvider.select((details) => details.currentMetadata),
+          );
+          final isLive = metadata?.isLiveStream ?? false;
+          final double totalDuration = isLive
+              ? 0
+              : (metadata?.trackDuration ?? 1000) / 1000;
           final playback = snapshot.data!;
           final buffering =
               playback.processingState == AudioProcessingState.buffering ||
@@ -67,6 +67,27 @@ class NowPlayingBottomBar extends ConsumerWidget {
 
           if ((totalDuration - currentDuration) < 0) {
             remainingTimeInSeconds = 0;
+          }
+
+          if (isLive) {
+            return Row(
+              children: [
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SeekBar(max: 1, value: buffering ? 0 : 1),
+                      if (buffering) const _DelayedBufferingIndicator(),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  context.localization.radioLiveLabel,
+                  style: IpodTypography.caption,
+                ),
+              ],
+            );
           }
 
           return Row(

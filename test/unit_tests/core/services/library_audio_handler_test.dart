@@ -1095,6 +1095,25 @@ void main() {
     expect(details.isShuffleEnabled, isFalse);
   });
 
+  test('throttles media session updates while the track advances', () async {
+    var emissions = 0;
+    final subscription = handler.playbackState.listen((_) => emissions++);
+    addTearDown(subscription.cancel);
+
+    await handler.setSongs([song(0)]);
+    await handler.play();
+    await flushEvents();
+    final baseline = emissions;
+
+    for (var ms = 16; ms <= 800; ms += 16) {
+      player.position = Duration(milliseconds: ms);
+      positions.add(player.position);
+    }
+    await flushEvents();
+
+    expect(emissions - baseline, lessThanOrEqualTo(2));
+  });
+
   test(
     'shuffle visits all 50k positions once and restores sequential order',
     () {

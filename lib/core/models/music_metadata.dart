@@ -48,6 +48,10 @@ class MusicMetadata extends HiveObject {
 
   bool get isSubsonic => serverId != null && remoteSongId != null;
 
+  bool get isInternetRadio => songId?.startsWith('subsonic-radio:') ?? false;
+
+  bool get isLiveStream => isInternetRadio || (trackDuration ?? 0) <= 0;
+
   final String? songId;
   final String? sourceVolume;
   final String? contentUri;

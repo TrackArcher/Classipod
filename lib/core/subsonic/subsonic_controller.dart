@@ -5,8 +5,10 @@ import 'dart:typed_data';
 import 'package:audio_service/audio_service.dart';
 import 'package:classipod/core/models/music_metadata.dart';
 import 'package:classipod/core/providers/shared_preferences_with_cache_provider.dart';
+import 'package:classipod/core/subsonic/internet_radio_station.dart';
 import 'package:classipod/core/subsonic/subsonic_client.dart';
 import 'package:classipod/core/subsonic/subsonic_credentials.dart';
+import 'package:classipod/core/subsonic/subsonic_radio_api.dart';
 import 'package:classipod/core/subsonic/subsonic_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
@@ -40,12 +42,12 @@ class SubsonicState {
   });
 
   bool get enabled => config?.enabled ?? false;
-  bool available(MusicMetadata song) =>
-      !song.isSubsonic ||
-      (enabled &&
-          signedIn &&
-          config?.id == song.serverId &&
-          songs.any((item) => item.identity == song.identity));
+  bool available(MusicMetadata song) {
+    if (!song.isSubsonic) return true;
+    if (!enabled || !signedIn || config?.id != song.serverId) return false;
+    if (song.isInternetRadio) return true;
+    return songs.any((item) => item.identity == song.identity);
+  }
 }
 
 final subsonicControllerProvider =
@@ -271,6 +273,34 @@ class SubsonicController extends AsyncNotifier<SubsonicState> {
     );
   }
 
+  SubsonicClient _requireClient() {
+    final client = _client;
+    if (!_current.enabled || client == null) {
+      throw const SubsonicException('signin');
+    }
+    return client;
+  }
+
+  Future<List<InternetRadioStation>> fetchInternetRadioStations() =>
+      SubsonicRadioApi.list(_requireClient());
+
+  Future<void> createInternetRadioStation({
+    required String name,
+    required String streamUrl,
+    String? homepageUrl,
+    String? coverArtUrl,
+  }) =>
+      SubsonicRadioApi.create(
+        _requireClient(),
+        name: name,
+        streamUrl: streamUrl,
+        homepageUrl: homepageUrl,
+        coverArtUrl: coverArtUrl,
+      );
+
+  Future<void> deleteInternetRadioStation(String id) =>
+      SubsonicRadioApi.delete(_requireClient(), id);
+
   Future<Uint8List> artwork(String reference) async {
     final uri = Uri.parse(reference);
     final client = _client;
@@ -292,6 +322,22 @@ class SubsonicController extends AsyncNotifier<SubsonicState> {
     }
     final client = _client;
     if (client == null) throw const SubsonicException('signin');
+    if (song.isInternetRadio) {
+      final directStream = song.filePath;
+      final uri = directStream != null && directStream.isNotEmpty
+          ? Uri.parse(directStream)
+          : client.uri('stream', {'id': song.remoteSongId!});
+      return AudioSource.uri(
+        uri,
+        tag: MediaItem(
+          id: song.identity,
+          title: song.getTrackName,
+          album: song.albumName,
+          artist: song.getTrackArtistNames,
+          artUri: _radioArtUri(client, song),
+        ),
+      );
+    }
     return AudioSource.uri(
       client.uri('stream', {'id': song.remoteSongId!}),
       tag: MediaItem(
@@ -308,5 +354,22 @@ class SubsonicController extends AsyncNotifier<SubsonicState> {
               }),
       ),
     );
+  }
+
+  Uri? _radioArtUri(SubsonicClient client, MusicMetadata song) {
+    final path = song.thumbnailPath;
+    if (path == null || path.isEmpty) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return Uri.parse(path);
+    }
+    if (path.startsWith('/')) return Uri.file(path);
+    final uri = Uri.tryParse(path);
+    if (uri?.scheme == 'subsonic') {
+      return client.uri('getCoverArt', {
+        'id': uri!.pathSegments.single,
+        'size': '600',
+      });
+    }
+    return null;
   }
 }

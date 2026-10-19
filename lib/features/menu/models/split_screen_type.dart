@@ -1,5 +1,6 @@
 enum SplitScreenType {
   albumArt,
+  apps,
   settings,
   librarySettings,
   subsonic,

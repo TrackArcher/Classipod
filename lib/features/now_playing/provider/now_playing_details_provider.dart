@@ -154,6 +154,23 @@ class NowPlayingDetailsNotifier extends Notifier<NowPlayingModel> {
     }
   }
 
+  void patchRadioMetadata(MusicMetadata updatedMetadata) {
+    if (!updatedMetadata.isInternetRadio) return;
+    state = state.copyWith(
+      currentMetadata:
+          state.currentMetadata?.identity == updatedMetadata.identity
+          ? updatedMetadata
+          : state.currentMetadata,
+      metadataList: [
+        for (final metadata in state.metadataList)
+          if (metadata.identity == updatedMetadata.identity)
+            updatedMetadata
+          else
+            metadata,
+      ],
+    );
+  }
+
   Future<void> updateMetadata(MusicMetadata updatedMetadata) async {
     state = state.copyWith(
       currentMetadata:

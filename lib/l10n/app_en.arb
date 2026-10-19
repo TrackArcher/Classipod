@@ -55,6 +55,22 @@
   "@musicMenuScreenTitle": {
     "description": "The title of the music menu screen"
   },
+  "appsMenuScreenTitle": "Apps",
+  "@appsMenuScreenTitle": {
+    "description": "The title of the apps launcher screen"
+  },
+  "appsMenuPreviewDescription": "Open any installed app, including work profile apps.",
+  "@appsMenuPreviewDescription": {
+    "description": "Split-screen preview text for the apps menu item"
+  },
+  "noAppsFound": "No launchable apps found.",
+  "@noAppsFound": {
+    "description": "Shown when the device has no apps the launcher can open"
+  },
+  "appsLoadError": "Could not load apps.",
+  "@appsLoadError": {
+    "description": "Shown when querying installed apps fails"
+  },
   "nowPlayingScreenTitle": "Now Playing",
   "@nowPlayingScreenTitle": {
     "description": "The title of the now playing screen"
@@ -141,6 +157,87 @@
         "format": "compact"
       }
     }
+  },
+  "radioScreenTitle": "Radio",
+  "@radioScreenTitle": {
+    "description": "The title of the internet radio screen"
+  },
+  "radioLiveLabel": "Live",
+  "@radioLiveLabel": {
+    "description": "Label shown while an internet radio stream is playing"
+  },
+  "internetRadioAlbumTitle": "Internet Radio",
+  "@internetRadioAlbumTitle": {
+    "description": "Album title used for internet radio now playing metadata"
+  },
+  "radioSubsonicRequired": "Connect to a Navidrome or Subsonic server in Settings to use internet radio.",
+  "@radioSubsonicRequired": {
+    "description": "Shown when internet radio needs a configured streaming server"
+  },
+  "radioLoadError": "Could not load radio stations.",
+  "@radioLoadError": {
+    "description": "Shown when getInternetRadioStations fails"
+  },
+  "addRadioStationTitle": "Add Radio Station",
+  "@addRadioStationTitle": {
+    "description": "Menu row and dialog title for adding an internet radio station"
+  },
+  "addRadioStationAction": "Add",
+  "@addRadioStationAction": {
+    "description": "Confirm button for the add radio station dialog"
+  },
+  "radioStationNameHint": "Station name",
+  "@radioStationNameHint": {
+    "description": "Placeholder for the radio station name field"
+  },
+  "radioStreamUrlHint": "Stream URL",
+  "@radioStreamUrlHint": {
+    "description": "Placeholder for the radio stream URL field"
+  },
+  "radioHomePageUrlHint": "Home page URL (optional)",
+  "@radioHomePageUrlHint": {
+    "description": "Placeholder for the optional radio home page URL field"
+  },
+  "deleteRadioStationTitle": "Remove Radio Station",
+  "@deleteRadioStationTitle": {
+    "description": "Title of the delete radio station confirmation dialog"
+  },
+  "deleteRadioStationMessage": "Remove \"{stationName}\" from your server?",
+  "@deleteRadioStationMessage": {
+    "description": "Body of the delete radio station confirmation dialog",
+    "placeholders": {
+      "stationName": {
+        "type": "String"
+      }
+    }
+  },
+  "removeRadioStationAction": "Remove",
+  "@removeRadioStationAction": {
+    "description": "Destructive action that deletes a radio station on the server"
+  },
+  "radioAddStationFieldsRequired": "Enter a station name and stream URL.",
+  "@radioAddStationFieldsRequired": {
+    "description": "Validation message when add radio station fields are empty"
+  },
+  "radioCoverArtUrlHint": "Cover art URL (optional)",
+  "@radioCoverArtUrlHint": {
+    "description": "Placeholder for an optional radio station cover image URL"
+  },
+  "elzicySettingsTitle": "Elzicy Radio Metadata",
+  "@elzicySettingsTitle": {
+    "description": "Title for Elzicy internet radio metadata settings"
+  },
+  "elzicySettingsDescription": "Optional Elzicy server for now-playing titles on internet radio. Falls back to stream metadata when unset.",
+  "@elzicySettingsDescription": {
+    "description": "Description shown in the Elzicy settings dialog"
+  },
+  "elzicyBaseUrlHint": "Elzicy API base URL",
+  "@elzicyBaseUrlHint": {
+    "description": "Placeholder for the Elzicy API base URL field"
+  },
+  "elzicyTokenHint": "Elzicy API token",
+  "@elzicyTokenHint": {
+    "description": "Placeholder for the Elzicy X-App-Token field"
   },
   "genresScreenTitle": "Genres",
   "@genresScreenTitle": {

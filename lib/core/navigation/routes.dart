@@ -3,6 +3,7 @@ import 'package:classipod/core/extensions/build_context_extensions.dart';
 import 'package:classipod/core/models/music_metadata.dart';
 import 'package:classipod/core/navigation/page_not_found_screen.dart';
 import 'package:classipod/features/app_startup/screens/splash_screen.dart';
+import 'package:classipod/features/apps/screens/apps_screen.dart';
 import 'package:classipod/features/custom_screen_elements/custom_scroll_behavior.dart';
 import 'package:classipod/features/custom_screen_elements/options_modal_page.dart';
 import 'package:classipod/features/device/widgets/device_frame.dart';
@@ -23,6 +24,7 @@ import 'package:classipod/features/music/playlist/screens/playlist_rename_screen
 import 'package:classipod/features/music/playlist/screens/playlist_songs_more_options_modal.dart';
 import 'package:classipod/features/music/playlist/screens/playlist_songs_screen.dart';
 import 'package:classipod/features/music/playlist/screens/playlists_screen.dart';
+import 'package:classipod/features/music/radio/screens/radio_screen.dart';
 import 'package:classipod/features/music/search/screens/search_more_options_modal.dart';
 import 'package:classipod/features/music/search/screens/search_screen.dart';
 import 'package:classipod/features/music/songs/screens/songs_more_options_modal.dart';
@@ -61,6 +63,7 @@ enum Routes {
   nowPlayingMoreOptions,
   sleepTimer,
   musicMenu,
+  apps,
   coverFlow,
   coverFlowSelection,
   artists,
@@ -79,6 +82,7 @@ enum Routes {
   genres,
   genreSongs,
   genresSongsMoreOptions,
+  radio,
   search,
   searchMoreOptions;
 
@@ -115,6 +119,8 @@ enum Routes {
         return context.localization.sleepTimerTitle;
       case musicMenu:
         return context.localization.musicMenuScreenTitle;
+      case apps:
+        return context.localization.appsMenuScreenTitle;
       case coverFlow:
         return context.localization.coverFlowScreenTitle;
       case coverFlowSelection:
@@ -151,6 +157,8 @@ enum Routes {
         return context.localization.genreSongsScreenTitle;
       case genresSongsMoreOptions:
         return context.localization.genreSongsScreenTitle;
+      case radio:
+        return context.localization.radioScreenTitle;
       case search:
         return context.localization.searchScreenTitle;
       case searchMoreOptions:
@@ -363,6 +371,13 @@ final routerProvider = Provider(
                         ),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: Routes.apps.toString(),
+                    name: Routes.apps.name,
+                    parentNavigatorKey: menuNavigatorKey,
+                    pageBuilder: (context, state) =>
+                        const CupertinoPage(child: AppsScreen()),
                   ),
                   GoRoute(
                     path: Routes.musicMenu.toString(),
@@ -673,6 +688,14 @@ final routerProvider = Provider(
                             ],
                           ),
                         ],
+                      ),
+                      GoRoute(
+                        path: Routes.radio.toString(),
+                        name: Routes.radio.name,
+                        parentNavigatorKey: rootNavigatorKey,
+                        pageBuilder: (context, state) => const CupertinoPage(
+                          child: ScreenPageContent(child: RadioScreen()),
+                        ),
                       ),
                       GoRoute(
                         path: Routes.search.name,

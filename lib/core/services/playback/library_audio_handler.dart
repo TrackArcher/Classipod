@@ -28,6 +28,9 @@ class LibraryAudioHandler extends BaseAudioHandler {
   Duration _resumePosition = Duration.zero;
   Completer<void>? _pendingSeek;
   Duration? _seekTarget;
+  DateTime? _lastMediaSessionPositionPublish;
+  PlaybackState? _lastPublishedPlaybackState;
+  static const _mediaSessionPositionInterval = Duration(seconds: 1);
 
   void _interruptSeek() {
     final pending = _pendingSeek;
@@ -100,10 +103,9 @@ class LibraryAudioHandler extends BaseAudioHandler {
             _restoredSongPending = false;
           }
         }
-        _broadcast();
+        _broadcastPosition();
       }),
     );
-    _subscriptions.add(player.playbackEventStream.listen((_) => _broadcast()));
     _subscriptions.add(player.playingStream.listen((_) => _broadcast()));
     _subscriptions.add(
       player.processingStateStream.distinct().listen((processing) {
@@ -114,6 +116,13 @@ class LibraryAudioHandler extends BaseAudioHandler {
             _serialize(() async {
               if (!player.playing ||
                   player.processingState != ProcessingState.completed) {
+                return;
+              }
+              final index = logicalQueue.index;
+              if (index >= 0 &&
+                  index < _songs.length &&
+                  _songs[index].isLiveStream) {
+                await _load(index, startPlaying: true);
                 return;
               }
               final next = logicalQueue.next(automatic: true);
@@ -167,6 +176,28 @@ class LibraryAudioHandler extends BaseAudioHandler {
       albums: albums.values.toList(),
       initialIndex: initialIndex,
     );
+  }
+
+  void updateCurrentSongMetadata(MusicMetadata metadata) {
+    final index = logicalQueue.index;
+    if (index < 0 || index >= _songs.length) return;
+    if (_songs[index].identity != metadata.identity) return;
+    final updated = List<MusicMetadata>.from(_songs);
+    updated[index] = metadata;
+    _songs = List.unmodifiable(updated);
+    if (_sourceLoaded) {
+      final currentItem = mediaItem.value;
+      if (currentItem != null) {
+        mediaItem.add(
+          currentItem.copyWith(
+            title: metadata.getTrackName,
+            album: metadata.albumName,
+            artist: metadata.getTrackArtistNames,
+          ),
+        );
+      }
+    }
+    _broadcast();
   }
 
   Future<void> setSongs(List<MusicMetadata> songs, {bool preload = true}) {
@@ -531,50 +562,96 @@ class LibraryAudioHandler extends BaseAudioHandler {
     _broadcast();
   }
 
-  void _broadcast() {
-    playbackState.add(
-      PlaybackState(
-        controls: [
-          MediaControl.skipToPrevious,
-          (_recovering ? _wantPlayback : player.playing)
-              ? MediaControl.pause
-              : MediaControl.play,
-          MediaControl.skipToNext,
-          MediaControl.stop,
-        ],
-        systemActions: const {
-          MediaAction.seek,
-          MediaAction.seekForward,
-          MediaAction.seekBackward,
-        },
-        androidCompactActionIndices: const [0, 1, 2],
-        processingState: _recovering
-            ? (_wantPlayback
-                  ? AudioProcessingState.buffering
-                  : AudioProcessingState.ready)
-            : _error != null
-            ? AudioProcessingState.error
-            : switch (player.processingState) {
-                ProcessingState.idle => AudioProcessingState.idle,
-                ProcessingState.loading => AudioProcessingState.loading,
-                ProcessingState.buffering => AudioProcessingState.buffering,
-                ProcessingState.ready => AudioProcessingState.ready,
-                ProcessingState.completed => AudioProcessingState.completed,
-              },
-        errorCode: _recovering || _error == null ? null : _errorCode,
-        errorMessage: _recovering ? null : _error,
-        playing: _recovering ? _wantPlayback : player.playing,
-        updatePosition: displayPosition,
-        bufferedPosition: player.bufferedPosition,
-        speed: player.speed,
-        repeatMode: switch (logicalQueue.loopMode) {
-          LoopMode.off => AudioServiceRepeatMode.none,
-          LoopMode.one => AudioServiceRepeatMode.one,
-          LoopMode.all => AudioServiceRepeatMode.all,
-        },
-        shuffleMode: logicalQueue.shuffleMode.audioServiceMode,
-      ),
+  Duration get _mediaSessionPosition {
+    final index = logicalQueue.index;
+    if (index >= 0 &&
+        index < _songs.length &&
+        _songs[index].isLiveStream) {
+      return Duration.zero;
+    }
+    return displayPosition;
+  }
+
+  PlaybackState _buildPlaybackState() {
+    return PlaybackState(
+      controls: [
+        MediaControl.skipToPrevious,
+        (_recovering ? _wantPlayback : player.playing)
+            ? MediaControl.pause
+            : MediaControl.play,
+        MediaControl.skipToNext,
+        MediaControl.stop,
+      ],
+      systemActions: const {
+        MediaAction.seek,
+        MediaAction.seekForward,
+        MediaAction.seekBackward,
+      },
+      androidCompactActionIndices: const [0, 1, 2],
+      processingState: _recovering
+          ? (_wantPlayback
+                ? AudioProcessingState.buffering
+                : AudioProcessingState.ready)
+          : _error != null
+          ? AudioProcessingState.error
+          : switch (player.processingState) {
+              ProcessingState.idle => AudioProcessingState.idle,
+              ProcessingState.loading => AudioProcessingState.loading,
+              ProcessingState.buffering => AudioProcessingState.buffering,
+              ProcessingState.ready => AudioProcessingState.ready,
+              ProcessingState.completed => AudioProcessingState.completed,
+            },
+      errorCode: _recovering || _error == null ? null : _errorCode,
+      errorMessage: _recovering ? null : _error,
+      playing: _recovering ? _wantPlayback : player.playing,
+      updatePosition: _mediaSessionPosition,
+      bufferedPosition: player.bufferedPosition,
+      speed: player.speed,
+      repeatMode: switch (logicalQueue.loopMode) {
+        LoopMode.off => AudioServiceRepeatMode.none,
+        LoopMode.one => AudioServiceRepeatMode.one,
+        LoopMode.all => AudioServiceRepeatMode.all,
+      },
+      shuffleMode: logicalQueue.shuffleMode.audioServiceMode,
     );
+  }
+
+  bool _isDuplicateMediaSessionState(PlaybackState next) {
+    final previous = _lastPublishedPlaybackState;
+    if (previous == null) return false;
+    return previous.playing == next.playing &&
+        previous.processingState == next.processingState &&
+        previous.errorCode == next.errorCode &&
+        previous.errorMessage == next.errorMessage &&
+        previous.speed == next.speed &&
+        previous.repeatMode == next.repeatMode &&
+        previous.shuffleMode == next.shuffleMode &&
+        listEquals(previous.controls, next.controls) &&
+        previous.updatePosition == next.updatePosition &&
+        previous.bufferedPosition == next.bufferedPosition;
+  }
+
+  void _publishPlaybackState() {
+    final state = _buildPlaybackState();
+    if (_isDuplicateMediaSessionState(state)) return;
+    _lastPublishedPlaybackState = state;
+    playbackState.add(state);
+  }
+
+  void _broadcastPosition() {
+    final now = DateTime.now();
+    if (_lastMediaSessionPositionPublish != null &&
+        now.difference(_lastMediaSessionPositionPublish!) <
+            _mediaSessionPositionInterval) {
+      return;
+    }
+    _lastMediaSessionPositionPublish = now;
+    _publishPlaybackState();
+  }
+
+  void _broadcast() {
+    _lastMediaSessionPositionPublish = null;
+    _publishPlaybackState();
   }
 
   Future<void> dispose() async {

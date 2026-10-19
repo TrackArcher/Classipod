@@ -17,4 +17,5 @@ enum SharedPreferencesKeys {
   isMenuFirstTime,
   isNowPlayingFirstTime,
   isInputTextBarFirstTime,
+  elzicyApiBaseUrl,
 }

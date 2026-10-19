@@ -4,6 +4,7 @@ import 'package:classipod/core/extensions/build_context_extensions.dart';
 import 'package:classipod/core/subsonic/subsonic_controller.dart';
 import 'package:classipod/features/menu/controller/split_screen_controller.dart';
 import 'package:classipod/features/menu/models/split_screen_type.dart';
+import 'package:classipod/features/apps/providers/installed_apps_provider.dart';
 import 'package:classipod/features/menu/widgets/animated_album_art_scroller.dart';
 import 'package:classipod/features/menu/widgets/icon_preview_widget.dart';
 import 'package:classipod/features/menu/widgets/language_preview_widget.dart';
@@ -113,6 +114,18 @@ class _SplitScreenPlaceholderState extends ConsumerState<SplitScreenPlaceholder>
           icon: CupertinoIcons.shuffle,
           contentText:
               "${ref.watch(songsProvider).length} ${context.localization.songsScreenTitle}",
+        );
+      } else if (splitScreenType == SplitScreenType.apps) {
+        final appCount = ref.watch(installedAppsProvider).maybeWhen(
+              data: (apps) => apps.length,
+              orElse: () => 0,
+            );
+        splitScreenWidget = IconPreviewWidget(
+          titleText: context.localization.appsMenuScreenTitle,
+          icon: CupertinoIcons.square_grid_2x2,
+          contentText: appCount > 0
+              ? '$appCount ${context.localization.appsMenuScreenTitle}'
+              : context.localization.appsMenuPreviewDescription,
         );
       } else if (splitScreenType == SplitScreenType.settings) {
         splitScreenWidget = const SettingsPreviewWidget();
