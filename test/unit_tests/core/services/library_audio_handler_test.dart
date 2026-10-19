@@ -1107,7 +1107,7 @@ void main() {
 
     for (var ms = 16; ms <= 800; ms += 16) {
       player.position = Duration(milliseconds: ms);
-      positions.add(player.position);
+      player.positions.add(player.position);
     }
     await flushEvents();
 

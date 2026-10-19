@@ -10,6 +10,7 @@ import 'package:classipod/core/subsonic/subsonic_client.dart';
 import 'package:classipod/core/subsonic/subsonic_credentials.dart';
 import 'package:classipod/core/subsonic/subsonic_radio_api.dart';
 import 'package:classipod/core/subsonic/subsonic_repository.dart';
+import 'package:classipod/features/music/radio/services/radio_artwork.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:just_audio/just_audio.dart';
@@ -301,6 +302,12 @@ class SubsonicController extends AsyncNotifier<SubsonicState> {
   Future<void> deleteInternetRadioStation(String id) =>
       SubsonicRadioApi.delete(_requireClient(), id);
 
+  Uri? coverArtUri(String coverArtId) {
+    final client = _client;
+    if (client == null || coverArtId.isEmpty) return null;
+    return client.uri('getCoverArt', {'id': coverArtId, 'size': '600'});
+  }
+
   Future<Uint8List> artwork(String reference) async {
     final uri = Uri.parse(reference);
     final client = _client;
@@ -334,7 +341,7 @@ class SubsonicController extends AsyncNotifier<SubsonicState> {
           title: song.getTrackName,
           album: song.albumName,
           artist: song.getTrackArtistNames,
-          artUri: _radioArtUri(client, song),
+          artUri: _radioArtUri(song),
         ),
       );
     }
@@ -356,20 +363,7 @@ class SubsonicController extends AsyncNotifier<SubsonicState> {
     );
   }
 
-  Uri? _radioArtUri(SubsonicClient client, MusicMetadata song) {
-    final path = song.thumbnailPath;
-    if (path == null || path.isEmpty) return null;
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      return Uri.parse(path);
-    }
-    if (path.startsWith('/')) return Uri.file(path);
-    final uri = Uri.tryParse(path);
-    if (uri?.scheme == 'subsonic') {
-      return client.uri('getCoverArt', {
-        'id': uri!.pathSegments.single,
-        'size': '600',
-      });
-    }
-    return null;
+  Uri? _radioArtUri(MusicMetadata song) {
+    return localMediaSessionArtUri(song.thumbnailPath);
   }
 }

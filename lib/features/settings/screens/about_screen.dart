@@ -59,10 +59,6 @@ class AboutScreen extends ConsumerWidget {
                   titleText: context.localization.versionAboutScreenTitle,
                   valueText: "2.1.0",
                 ),
-                AboutListTile(
-                  titleText: context.localization.madeWithLoveTitle,
-                  valueText: "Aditya",
-                ),
               ],
             ),
           ),

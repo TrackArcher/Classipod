@@ -1,4 +1,3 @@
-import 'package:classipod/core/constants/constants.dart';
 import 'package:classipod/core/extensions/build_context_extensions.dart';
 import 'package:classipod/core/extensions/go_router_extensions.dart';
 import 'package:classipod/core/navigation/routes.dart';
@@ -13,7 +12,6 @@ import 'package:classipod/features/settings/widgets/settings_list_tile.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 enum _SettingsDisplayItems {
   about,
@@ -33,8 +31,7 @@ enum _SettingsDisplayItems {
   immersiveMode,
   showAppTutorial,
   librarySettings,
-  resetSettings,
-  donate;
+  resetSettings;
 
   String title(BuildContext context) {
     switch (this) {
@@ -74,8 +71,6 @@ enum _SettingsDisplayItems {
         return context.localization.librarySettingsScreenTitle;
       case resetSettings:
         return context.localization.resetSettingsTitle;
-      case donate:
-        return context.localization.donateSettingTitle;
     }
   }
 }
@@ -181,12 +176,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         await ref
             .read(settingsPreferencesControllerProvider.notifier)
             .resetSettings();
-        break;
-      case _SettingsDisplayItems.donate:
-        await launchUrl(
-          Uri.parse(Constants.donationLinkUrl),
-          mode: LaunchMode.externalApplication,
-        );
         break;
     }
   }
@@ -312,10 +301,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       case _SettingsDisplayItems.resetSettings:
         ref.read(splitScreenControllerProvider.notifier).changeSplitScreenType =
             SplitScreenType.resetSettings;
-        break;
-      case _SettingsDisplayItems.donate:
-        ref.read(splitScreenControllerProvider.notifier).changeSplitScreenType =
-            SplitScreenType.donate;
         break;
       default:
         ref.read(splitScreenControllerProvider.notifier).changeSplitScreenType =

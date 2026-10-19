@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:classipod/core/models/music_metadata.dart';
+import 'package:classipod/features/music/radio/services/radio_artwork.dart';
 import 'package:classipod/core/models/playback_shuffle_mode.dart';
 import 'package:classipod/core/services/playback/logical_queue.dart';
 import 'package:classipod/core/utils/album_order.dart';
@@ -193,6 +194,7 @@ class LibraryAudioHandler extends BaseAudioHandler {
             title: metadata.getTrackName,
             album: metadata.albumName,
             artist: metadata.getTrackArtistNames,
+            artUri: localMediaSessionArtUri(metadata.thumbnailPath),
           ),
         );
       }
