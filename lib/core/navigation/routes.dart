@@ -3,7 +3,12 @@ import 'package:classipod/core/extensions/build_context_extensions.dart';
 import 'package:classipod/core/models/music_metadata.dart';
 import 'package:classipod/core/navigation/page_not_found_screen.dart';
 import 'package:classipod/features/app_startup/screens/splash_screen.dart';
+import 'package:classipod/features/apps/models/apps_options_args.dart';
+import 'package:classipod/features/apps/models/installed_app.dart';
+import 'package:classipod/features/apps/screens/app_rename_screen.dart';
+import 'package:classipod/features/apps/screens/apps_more_options_modal.dart';
 import 'package:classipod/features/apps/screens/apps_screen.dart';
+import 'package:classipod/features/apps/screens/hidden_apps_screen.dart';
 import 'package:classipod/features/custom_screen_elements/custom_scroll_behavior.dart';
 import 'package:classipod/features/custom_screen_elements/options_modal_page.dart';
 import 'package:classipod/features/device/widgets/device_frame.dart';
@@ -64,6 +69,10 @@ enum Routes {
   sleepTimer,
   musicMenu,
   apps,
+  appsMoreOptions,
+  appsRename,
+  hiddenApps,
+  hiddenAppsMoreOptions,
   coverFlow,
   coverFlowSelection,
   artists,
@@ -121,6 +130,13 @@ enum Routes {
         return context.localization.musicMenuScreenTitle;
       case apps:
         return context.localization.appsMenuScreenTitle;
+      case appsMoreOptions:
+      case hiddenAppsMoreOptions:
+        return context.localization.appsMenuScreenTitle;
+      case appsRename:
+        return context.localization.appRenameAction;
+      case hiddenApps:
+        return context.localization.hiddenAppsScreenTitle;
       case coverFlow:
         return context.localization.coverFlowScreenTitle;
       case coverFlowSelection:
@@ -378,6 +394,56 @@ final routerProvider = Provider(
                     parentNavigatorKey: menuNavigatorKey,
                     pageBuilder: (context, state) =>
                         const CupertinoPage(child: AppsScreen()),
+                    routes: [
+                      GoRoute(
+                        path: Routes.hiddenApps.name,
+                        name: Routes.hiddenApps.name,
+                        parentNavigatorKey: menuNavigatorKey,
+                        pageBuilder: (context, state) => const CupertinoPage(
+                          child: HiddenAppsScreen(),
+                        ),
+                        routes: [
+                          GoRoute(
+                            path: Routes.hiddenAppsMoreOptions.name,
+                            name: Routes.hiddenAppsMoreOptions.name,
+                            parentNavigatorKey: menuNavigatorKey,
+                            pageBuilder: (context, state) => OptionsModalPage(
+                              context: context,
+                              title: Routes.hiddenAppsMoreOptions.title(
+                                context,
+                              ),
+                              builder: (context) => AppsMoreOptionsModal(
+                                routeName: Routes.hiddenAppsMoreOptions.name,
+                                args: state.extra as AppsOptionsArgs,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: Routes.appsMoreOptions.name,
+                        name: Routes.appsMoreOptions.name,
+                        parentNavigatorKey: menuNavigatorKey,
+                        pageBuilder: (context, state) => OptionsModalPage(
+                          context: context,
+                          title: Routes.appsMoreOptions.title(context),
+                          builder: (context) => AppsMoreOptionsModal(
+                            routeName: Routes.appsMoreOptions.name,
+                            args: state.extra as AppsOptionsArgs,
+                          ),
+                        ),
+                      ),
+                      GoRoute(
+                        path: Routes.appsRename.name,
+                        name: Routes.appsRename.name,
+                        parentNavigatorKey: menuNavigatorKey,
+                        pageBuilder: (context, state) => CupertinoPage(
+                          child: AppRenameScreen(
+                            app: state.extra as InstalledApp,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: Routes.musicMenu.toString(),

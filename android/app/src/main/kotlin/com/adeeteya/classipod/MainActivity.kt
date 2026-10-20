@@ -1,5 +1,6 @@
 package com.adeeteya.classipod
 
+import android.content.ComponentCallbacks2
 import android.content.pm.LauncherApps
 import android.os.Process
 import android.os.UserManager
@@ -79,6 +80,15 @@ class MainActivity : AudioServiceActivity() {
         return apps
     }
 
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) {
+            flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
+                MethodChannel(messenger, MEMORY_CHANNEL).invokeMethod("trimMemory", null)
+            }
+        }
+    }
+
     private fun launchApp(packageName: String, userSerial: Long) {
         val launcherApps = getSystemService(LauncherApps::class.java)
         val userManager = getSystemService(UserManager::class.java)
@@ -96,5 +106,6 @@ class MainActivity : AudioServiceActivity() {
 
     companion object {
         private const val INSTALLED_APPS_CHANNEL = "com.adeeteya.classipod/installed_apps"
+        private const val MEMORY_CHANNEL = "com.adeeteya.classipod/memory"
     }
 }

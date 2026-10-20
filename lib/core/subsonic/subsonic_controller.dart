@@ -206,6 +206,20 @@ class SubsonicController extends AsyncNotifier<SubsonicState> {
     state = const AsyncData(SubsonicState());
   }
 
+  void cancelActiveRefresh() {
+    final old = _current;
+    if (!old.scanning) return;
+    _generation++;
+    state = AsyncData(
+      SubsonicState(
+        config: old.config,
+        songs: old.songs,
+        signedIn: old.signedIn,
+        error: old.error,
+      ),
+    );
+  }
+
   Future<void> refresh({bool clearArtwork = false}) async {
     final old = _current;
     final client = _client;

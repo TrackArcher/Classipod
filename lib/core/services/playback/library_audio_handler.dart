@@ -40,6 +40,7 @@ class LibraryAudioHandler extends BaseAudioHandler {
 
   bool get recovering => _recovering;
   bool get wantsPlayback => _wantPlayback;
+  bool get sourceEngaged => _sourceLoaded || _loading || _recovering;
   Duration get displayPosition => _recovering ? _resumePosition : _lastPosition;
 
   void _cancelRecovery() {
@@ -416,7 +417,34 @@ class LibraryAudioHandler extends BaseAudioHandler {
     _sourceVersion++;
     return _serialize(() async {
       await player.stop();
+      await player.clearAudioSources();
+      _sourceLoaded = false;
+      mediaItem.add(null);
       _broadcast();
+      await super.stop();
+    });
+  }
+
+  /// Releases ExoPlayer / audio focus while keeping the logical queue for resume.
+  Future<void> suspendEngine({bool clearQueue = false}) {
+    _interruptSeek();
+    _wantPlayback = false;
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _sourceVersion++;
+    _cancelRecovery();
+    return _serialize(() async {
+      await player.stop();
+      await player.clearAudioSources();
+      _sourceLoaded = false;
+      if (clearQueue) {
+        _songs = const [];
+        logicalQueue.reset(0);
+        _indices.add(null);
+      }
+      mediaItem.add(null);
+      _broadcast();
+      await super.stop();
     });
   }
 

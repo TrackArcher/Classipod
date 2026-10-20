@@ -1114,6 +1114,21 @@ void main() {
     expect(emissions - baseline, lessThanOrEqualTo(2));
   });
 
+  test('suspendEngine clears native source but keeps logical queue', () async {
+    await handler.setSongs([song(0), song(1)]);
+    await handler.play();
+    await flushEvents();
+    expect(player.sourceCount, 1);
+    await handler.pause();
+    await handler.suspendEngine();
+    expect(player.sourceCount, 0);
+    expect(handler.sourceEngaged, isFalse);
+    expect(handler.songs.length, 2);
+    await handler.play();
+    await flushEvents();
+    expect(player.sourceCount, 1);
+  });
+
   test(
     'shuffle visits all 50k positions once and restores sequential order',
     () {

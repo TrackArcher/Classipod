@@ -18,4 +18,5 @@ enum SharedPreferencesKeys {
   isNowPlayingFirstTime,
   isInputTextBarFirstTime,
   elzicyApiBaseUrl,
+  appsLauncherOverrides,
 }

@@ -12,6 +12,7 @@ import 'package:classipod/features/music/album/models/album_model.dart';
 import 'package:classipod/features/music/playlist/models/playlist_model.dart';
 import 'package:classipod/features/now_playing/models/now_playing_model.dart';
 import 'package:classipod/features/now_playing/provider/now_playing_details_provider.dart';
+import 'package:classipod/features/music/radio/utils/radio_elzicy_metadata.dart';
 import 'package:classipod/features/settings/controller/settings_preferences_controller.dart';
 import 'package:classipod/features/settings/widgets/subsonic_dialog.dart';
 import 'package:flutter/foundation.dart';
@@ -391,7 +392,9 @@ class AudioPlayerServiceNotifier extends AsyncNotifier<void> {
         musicMetadataList: metadataList,
       );
       await playSongAtIndex(stationIndex);
+      await refreshRadioNowPlayingFromElzicy(ref);
       Future.delayed(const Duration(milliseconds: 100), play);
+      await refreshRadioNowPlayingFromElzicy(ref);
     });
   }
 

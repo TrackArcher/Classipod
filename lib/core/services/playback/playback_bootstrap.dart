@@ -8,7 +8,7 @@ Future<void> initializeMediaSession(AudioHandler handler) async {
       androidNotificationChannelName: 'ClassiPod Audio playback',
       androidNotificationChannelDescription:
           'Notification to control the currently playing music files',
-      androidNotificationOngoing: true,
+      androidNotificationOngoing: false,
       androidNotificationIcon: 'drawable/ic_stat_name',
     ),
   );

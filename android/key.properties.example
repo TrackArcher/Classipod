@@ -1,0 +1,10 @@
+# Copy to android/key.properties and fill in (never commit key.properties).
+#
+# Create a keystore once:
+#   keytool -genkey -v -keystore ~/classipod-release.keystore \
+#     -alias classipod -keyalg RSA -keysize 2048 -validity 10000
+#
+storePassword=your-store-password
+keyPassword=your-key-password
+keyAlias=classipod
+storeFile=/home/YOU/classipod-release.keystore

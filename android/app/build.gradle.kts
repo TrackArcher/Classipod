@@ -1,6 +1,5 @@
 import java.util.Properties
 import java.io.FileInputStream
-import java.io.FileNotFoundException
 
 plugins {
     id("com.android.application")
@@ -8,11 +7,16 @@ plugins {
 }
 
 val keystoreProperties = Properties()
-try {
-    val keystorePropertiesFile = rootProject.file("key.properties")
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-} catch (e: FileNotFoundException) {
-    println("Warning: key.properties file not found. Ensure the file is present before building the release version.")
+} else {
+    println(
+        "Warning: android/key.properties not found. Release builds will be " +
+            "signed with the debug key (fine for sideloading, not for Play Store). " +
+            "See android/key.properties.example.",
+    )
 }
 
 android {
@@ -55,7 +59,11 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 

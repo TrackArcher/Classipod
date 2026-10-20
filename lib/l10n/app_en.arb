@@ -71,6 +71,39 @@
   "@appsLoadError": {
     "description": "Shown when querying installed apps fails"
   },
+  "appRenameAction": "Rename",
+  "@appRenameAction": {
+    "description": "Rename an app in the launcher list"
+  },
+  "appHideAction": "Hide",
+  "@appHideAction": {
+    "description": "Hide an app from the launcher list"
+  },
+  "appUnhideAction": "Show",
+  "@appUnhideAction": {
+    "description": "Restore a hidden app to the launcher list"
+  },
+  "appRenameEditAction": "Edit Name",
+  "@appRenameEditAction": {
+    "description": "Open the iPod-style keyboard to edit an app name"
+  },
+  "hiddenAppsMenuEntry": "Hidden Apps ({count})",
+  "@hiddenAppsMenuEntry": {
+    "description": "Apps menu row that opens the hidden apps list",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hiddenAppsScreenTitle": "Hidden Apps",
+  "@hiddenAppsScreenTitle": {
+    "description": "Title for the hidden apps screen"
+  },
+  "noHiddenApps": "No hidden apps.",
+  "@noHiddenApps": {
+    "description": "Shown when the hidden apps list is empty"
+  },
   "nowPlayingScreenTitle": "Now Playing",
   "@nowPlayingScreenTitle": {
     "description": "The title of the now playing screen"
@@ -231,7 +264,7 @@
   "@elzicySettingsDescription": {
     "description": "Description shown in the Elzicy settings dialog"
   },
-  "elzicyBaseUrlHint": "Elzicy API base URL",
+  "elzicyBaseUrlHint": "https://api.elzen.stream",
   "@elzicyBaseUrlHint": {
     "description": "Placeholder for the Elzicy API base URL field"
   },
