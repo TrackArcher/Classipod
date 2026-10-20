@@ -1,8 +1,17 @@
 <div align="center">
 
-# 🎵 ClassiPod
+# 🎵 ClassiPod (fork)
 
 ![Classipod App Screenshots](screenshots/combined.jpg)
+
+**Public fork** of [Classipod](https://github.com/adeeteya/Classipod) by
+Aditya R. This project is **not** the official app and is **not** endorsed by
+the original author.
+
+**This product includes software developed by Aditya R.**
+
+Source and binaries are under the [BSD 4-Clause license](LICENSE). See
+[NOTICE](NOTICE) for attribution and redistribution requirements.
 
 ClassiPod brings an iPod Classic-inspired click wheel to your music collection.
 Play local audio files or stream from a Subsonic-compatible server, including
@@ -291,14 +300,24 @@ It does not import local folders.
 | [**hive_ce_generator**](https://pub.dev/packages/hive_ce_generator)                           | For automatically generating Hive TypeAdapters                                      |
 | [**riverpod_lint**](https://pub.dev/packages/riverpod_lint)                                   | For using riverpod specific linting rules                                           |
 
-## 🤓 Author
+## 🤓 Authors
 
-**[Aditya R](https://github.com/adeeteya)**
+| | |
+|---|---|
+| **Original** | [Aditya R](https://github.com/adeeteya) — [Classipod](https://github.com/adeeteya/Classipod) |
+| **This fork** | Willem — modifications in this repository |
 
-## 🔖 LICENCE
+## 🔖 License
 
-Copyright (c) 2025 Aditya R
-[BSD-4-Clause LICENCE](https://github.com/adeeteya/Classipod/blob/master/LICENSE)
+Copyright (c) 2025, Aditya R  
+Copyright (c) 2025, Willem (fork modifications)
+
+Licensed under the **BSD 4-Clause** license. See [LICENSE](LICENSE) and
+[NOTICE](NOTICE).
+
+When you redistribute source or binaries (including APK releases), include
+`LICENSE`, `NOTICE`, and the acknowledgment: *This product includes software
+developed by Aditya R.*
 
 ## 🙏 Attributions
 

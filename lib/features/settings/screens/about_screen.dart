@@ -59,6 +59,18 @@ class AboutScreen extends ConsumerWidget {
                   titleText: context.localization.versionAboutScreenTitle,
                   valueText: "2.1.0",
                 ),
+                AboutListTile(
+                  titleText: context.localization.aboutForkNoticeTitle,
+                  valueText: context.localization.aboutForkNoticeValue,
+                ),
+                AboutListTile(
+                  titleText: context.localization.aboutUpstreamTitle,
+                  valueText: context.localization.aboutUpstreamValue,
+                ),
+                AboutListTile(
+                  titleText: context.localization.aboutBsdAcknowledgmentTitle,
+                  valueText: context.localization.aboutBsdAcknowledgmentValue,
+                ),
               ],
             ),
           ),

@@ -336,6 +336,30 @@
   "@madeWithLoveTitle": {
     "description": "The title of the made with love section in the about screen"
   },
+  "aboutForkNoticeTitle": "Project",
+  "@aboutForkNoticeTitle": {
+    "description": "About screen title for fork disclaimer"
+  },
+  "aboutForkNoticeValue": "Unofficial fork; not endorsed by the original Classipod author.",
+  "@aboutForkNoticeValue": {
+    "description": "About screen fork disclaimer (BSD clause 4)"
+  },
+  "aboutUpstreamTitle": "Upstream",
+  "@aboutUpstreamTitle": {
+    "description": "About screen title for original project credit"
+  },
+  "aboutUpstreamValue": "Classipod by Aditya R (BSD-4-Clause)",
+  "@aboutUpstreamValue": {
+    "description": "About screen upstream credit"
+  },
+  "aboutBsdAcknowledgmentTitle": "Acknowledgment",
+  "@aboutBsdAcknowledgmentTitle": {
+    "description": "About screen title for BSD clause 3 acknowledgment"
+  },
+  "aboutBsdAcknowledgmentValue": "This product includes software developed by Aditya R.",
+  "@aboutBsdAcknowledgmentValue": {
+    "description": "BSD 4-Clause clause 3 required acknowledgment text"
+  },
   "noMusicFilesFound": "No Music",
   "@noMusicFilesFound": {
     "description": "The message displayed when no music files are found"

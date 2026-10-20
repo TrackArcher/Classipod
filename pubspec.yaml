@@ -1,5 +1,6 @@
 name: classipod
 description: "An iPod Classic-inspired player for local music and Subsonic/Navidrome streaming."
+license: BSD-4-Clause
 
 publish_to: 'none'
 
@@ -76,6 +77,8 @@ flutter:
     - assets/fonts/
     - assets/images/
     - assets/sounds/
+    - LICENSE
+    - NOTICE
 
   fonts:
     - family: Helvetica
